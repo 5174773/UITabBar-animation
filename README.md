@@ -9,7 +9,8 @@
 需要把 LJGNB.h  LJGNB.M 放入自己的项目即可
 
 
-` ``#import "LJGNB.h"
+```objc
+#import "LJGNB.h"
 #import <objc/runtime.h>
 
 @implementation UITabBar (a)
