@@ -1,12 +1,59 @@
 # PDNSWDXFXL
 ##下面是展示图片
+
+
+
 ![image](https://github.com/5174773/UITabBar-animation/blob/master/tabbar.gif)
 
 
 需要把 LJGNB.h  LJGNB.M 放入自己的项目即可
 
 
-/添加动画
+` ``#import "LJGNB.h"
+#import <objc/runtime.h>
+
+@implementation UITabBar (a)
+
++ (void)load
+{
+static dispatch_once_t onceToken;
+dispatch_once(&onceToken, ^{
+[self swizzleMethod:@selector(layoutSubviewsNew) originalSelector:@selector(layoutSubviews)];
+});
+}
+
++ (void)swizzleMethod:(SEL)swizzledSelector originalSelector:(SEL)originalSelector
+{
+Class swizzledClass = [self class];
+
+Method swizzledMethod = class_getInstanceMethod(swizzledClass, swizzledSelector);
+IMP swizzledIMP = method_getImplementation(swizzledMethod);
+const char *swizzledType = method_getTypeEncoding(swizzledMethod);
+
+Method originalMethod = class_getInstanceMethod(swizzledClass, originalSelector);
+IMP originalIMP = method_getImplementation(originalMethod);
+const char *originalType = method_getTypeEncoding(originalMethod);
+
+class_replaceMethod(swizzledClass, swizzledSelector, originalIMP, originalType);
+class_replaceMethod(swizzledClass, originalSelector, swizzledIMP, swizzledType);
+}
+
+-(void)layoutSubviewsNew
+{
+[self layoutSubviewsNew];
+
+//遍历判断self.subviews
+for (UIControl *tabBarBtn in self.subviews)
+{
+//判断是否是ALTbaBar
+if ([tabBarBtn isKindOfClass:NSClassFromString(@"UITabBarButton")])
+{
+[tabBarBtn addTarget:self action:@selector(tabBarBtnDidClick:) forControlEvents:UIControlEventTouchUpInside];
+}
+}
+}
+
+//添加动画
 -(void)tabBarBtnDidClick:(UIControl *)tabBarButton
 {
 //遍历出tabbar上的图片
@@ -28,3 +75,8 @@ imageView.transform = CGAffineTransformMakeScale(1.0, 1.0);
 }
 }
 }
+
+
+
+@end
+ ```
